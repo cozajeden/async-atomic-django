@@ -41,7 +41,7 @@ class AsyncAtomicContextManager(Atomic):
 
 #### The decorator:
 ```python
-def aatomic(using=None, savepoint=True, durable=False) -> Union[Exception, None]:
+def aatomic(using=None, savepoint=True, durable=False):
     """This decorator will run function in new atomic context. Which will be destroyed after function ends."""
     def decorator(fun):
         async def wrapper(*args, **kwargs):

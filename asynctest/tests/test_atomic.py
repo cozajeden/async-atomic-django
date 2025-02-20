@@ -47,7 +47,7 @@ class AsyncAtomicContextManager(Atomic):
         for conn in connections.all():
             conn.close()
 
-def aatomic(using=None, savepoint=True, durable=False) -> Union[Exception, None]:
+def aatomic(using=None, savepoint=True, durable=False):
     """This decorator will run function in new atomic context. Which will be destroyed after function ends."""
     def decorator(fun):
         async def wrapper(*args, **kwargs):
@@ -64,7 +64,7 @@ async def async_select_for_update__decorator(pk: int, number: int):
     await sleep(randint(0, 100)/10000)
     obj = await MyModel.objects.select_for_update().aget(pk=pk)
     logger.info(f'{number} decorator: Got object in, saved {obj.saved} times.')
-    await sleep(0.001)
+    await sleep(0.005)
     await obj.asave()
     logger.info(f'{number} decorator: Finished.')
 
@@ -75,7 +75,7 @@ async def async_select_for_update__context_manager(pk: int, number: int) -> Unio
             await sleep(randint(0, 100)/10000)
             obj = await aacm.run_in_context(MyModel.objects.select_for_update().get, pk=pk)
             logger.info(f'{number} context_manager: Got object in, saved {obj.saved} times.')
-            await sleep(0.001)
+            await sleep(0.005)
             await aacm.run_in_context(obj.save)
             logger.info(f'{number} context_manager: Finished.')
     except Exception as e:
@@ -85,9 +85,7 @@ async def async_select_for_update__context_manager(pk: int, number: int) -> Unio
 async def handle_errors_outside_decorator(pk: int, number: int) -> Union[Exception, None]:
     """for decorator we have to handle exceptions outside tested method."""
     try:
-        start = time_ns()
         await async_select_for_update__decorator(pk, number)
-        await asyncio.sleep(0.001)
     except Exception as e:
         logger.error(f'{number} decorator: {str(e).strip()}')
         return e
@@ -105,7 +103,7 @@ def test_will_throw_error_for_too_many_connections__context_manager(event_loop: 
         result for result in results
         if isinstance(result, OperationalError)
         and str(result).find('too many clients already') != -1
-    ]), 'Expected error for too many clients in db. We are running 200 tasks and Postgres by defoult has default limit of 100.'
+    ]), 'Expected error for too many clients in db. We are running 200 tasks and Postgres has default limit of 100.'
     assert len([
         result for result in results
         if not isinstance(result, OperationalError)
@@ -126,7 +124,7 @@ def test_will_throw_error_for_too_many_connections__decorator(event_loop: asynci
         result for result in results
         if isinstance(result, OperationalError)
         and str(result).find('too many clients already') != -1
-    ]), 'Expected error for too many clients in db. We are running 200 tasks and Postgres by defoult has default limit of 100.'
+    ]), 'Expected error for too many clients in db. We are running 200 tasks and Postgres has default limit of 100.'
     assert len([
         result for result in results
         if not isinstance(result, OperationalError)
