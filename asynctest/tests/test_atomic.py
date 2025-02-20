@@ -19,6 +19,8 @@ logger = logging.getLogger('asynctest.tests')
 
 
 class AsyncAtomicContextManager(Atomic):
+    """To async use atomic context, you need to use run_in_context on db related methods."""
+
     def __init__(self, using=None, savepoint=True, durable=False):
         super().__init__(using, savepoint, durable)
         self.executor = ThreadPoolExecutor(1)
@@ -41,7 +43,7 @@ class AsyncAtomicContextManager(Atomic):
         return future.result()
     
     def close_connections(self):
-        """It os necessary to close connections before shutdown."""
+        """It is necessary to close connections before shutdown."""
         for conn in connections.all():
             conn.close()
 
@@ -67,7 +69,6 @@ async def async_select_for_update__decorator(pk: int, number: int):
     logger.info(f'{number} decorator: Finished.')
 
 async def async_select_for_update__context_manager(pk: int, number: int) -> Union[Exception, None]:
-    """To async use atomic context, you need to use run_in_context on db related methods."""
     try:
         async with AsyncAtomicContextManager() as aacm:
             logger.info(f'{number} context_manager: Started.')
@@ -147,5 +148,5 @@ def test_will_finish_gracefully(event_loop: asyncio.BaseEventLoop):
         result for result in results
         if isinstance(result, OperationalError)
         and str(result).find('too many clients already') != -1
-    ]), 'There should be no error. We are running 90 tasks and Postgres by defoult has default limit of 100.'
+    ]), 'There should be no error. We are running 90 tasks and Postgres has default limit of 100.'
     logger.debug('\n')
