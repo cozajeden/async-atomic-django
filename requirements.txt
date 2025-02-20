@@ -1,0 +1,6 @@
+Django
+psycopg2-binary
+daphne
+pytest
+pytest-asyncio
+pytest-django
