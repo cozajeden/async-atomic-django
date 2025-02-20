@@ -5,7 +5,7 @@ As the response to stackoverflow question: [How to use transaction with "async" 
 
 ### The solution is to run the async function in a thread with different database connection.
 To achieve this we need to use another thread with different context, which will result in a different database connection.
-It also rquire to close the connection after the thread is finished, to avoid the hanging connection. Here is our solution:
+It also rquire to close the connection after the thread is finished, to avoid the hanging connection. Here is my solution:
 
 #### The context manager:
 ```python
