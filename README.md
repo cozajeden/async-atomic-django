@@ -1,6 +1,6 @@
 # Asynchronous atomic decorator in Django
 
-### Those are the tests for the aynchronic atomic decorator in Django.
+### Those are the tests for the asynchronic atomic decorator in Django.
 As the response to stackoverflow question: [How to use transaction with "async" functions in Django?](https://stackoverflow.com/questions/74575922/how-to-use-transaction-with-async-functions-in-django)
 
 ### The solution is to run the async function in a thread with different database connection.
