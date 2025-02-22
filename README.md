@@ -25,7 +25,6 @@ class AsyncAtomicContextManager(Atomic):
         future = wrap_future(self.executor.submit(self.close_connections))
         await future
         self.executor.shutdown()
-        await sleep(1)
 
     async def run_in_context(self, fun, *args, **kwargs):
         """Use this method to run db related methods in atomic context."""
